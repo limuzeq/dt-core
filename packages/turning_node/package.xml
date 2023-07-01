@@ -4,6 +4,8 @@
   <version>1.0.0</version>
   <description>TODO: Add a description of package `xx` in `package.xml`.</description>
 
+  <maintainer email="lpaull@mit.edu">Liam Paull</maintainer>
+
 
   <license>GPLv3</license>
 
