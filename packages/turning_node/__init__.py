@@ -19,41 +19,45 @@ class TurningNode(DTROS):
         self.angle_accumulated = 0.0
         self.angle_to_turn = 2 * 3.14159  # 360 degrees in radians
 
-        # Construct subscriber for FSM state
-        self.sub_fsm_state = rospy.Subscriber(
-            "~fsm_node/fsm_state",
-            FSMState,
-            self.callbackFSMState,
-            queue_size=1
+        # Construct publisher for wheel commands
+        self.pub_wheel_cmd = rospy.Publisher(
+            "~wheel_command", Float32, queue_size=1, dt_topic_type=TopicType.CONTROL
         )
 
         self.log("Initialized!")
 
-    def callbackFSMState(self, fsm_state_msg):
-        """Callback for receiving the FSM state message.
+    def executeTurningFunction(self):
+        """Execute the 360-degree turning function."""
+        while self.angle_accumulated < self.angle_to_turn:
+            # Publish wheel command to turn
+            self.publishWheelCommand(self.turning_speed)
+            # Sleep for a short duration
+            rospy.sleep(0.1)
+            # Update the accumulated angle
+            self.angle_accumulated += abs(self.turning_speed * 0.1)
+
+        # Stop the turning motion
+        self.publishWheelCommand(0.0)
+        self.log("Completed 360-degree turn.")
+
+    def publishWheelCommand(self, speed):
+        """Publish the wheel command for turning.
 
         Args:
-            fsm_state_msg (:obj:`FSMState`): Message containing the current FSM state.
+            speed (:obj:`float`): The wheel turning speed.
         """
-        self.fsm_state = fsm_state_msg.state
-
-        if self.fsm_state == "TURNING":
-            # Call the turning function here
-            self.executeTurningFunction()
-
-    def executeTurningFunction(self):
-        """Execute the turning function."""
-        # Implement your turning logic here
-        # This function will be called when the state is TURNING
-        self.log("Executing turning function.")
+        wheel_command = Float32()
+        wheel_command.data = speed
+        self.pub_wheel_cmd.publish(wheel_command)
 
     def onShutdown(self):
         """Callback function to execute on shutdown."""
+        self.publishWheelCommand(0.0)
         rospy.loginfo("Shutting down.")
 
 
 if __name__ == "__main__":
     # Initialize the node
     turning_node = TurningNode(node_name="turning_node")
-    # Keep it spinning
-    rospy.spin()
+    # Execute the turning function
+    turning_node.executeTurningFunction()
