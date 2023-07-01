@@ -54,9 +54,6 @@ states:
     lights: "RED"
   TURNING:
     active_nodes:
-      - anti_instagram
-      - line_detector_node
-      - lane_filter_node
-      - ground_projection_node
+      - turning_node
     lights: "BLUE"
 
