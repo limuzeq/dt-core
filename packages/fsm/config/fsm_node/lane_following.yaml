@@ -12,14 +12,6 @@ events: # Maps from subscribing topic to signal ids
     topic: "joy_mapper_node/joystick_override"
     msg_type: "BoolStamped"
     trigger: False
-  start_turning:
-    topic: "turning_node/start"
-    msg_type: "BoolStamped"
-    trigger: True
-  stop_turning:
-    topic: "turning_node/stop"
-    msg_type: "BoolStamped"
-    trigger: True
 
 # Define nodes
 nodes:
@@ -32,10 +24,9 @@ nodes:
 
 # Define state transitions
 
-  joystick_override_on: "NORMAL_JOYSTICK_CONTROL"
+  joystick_override_on: "TURNING"
   joystick_override_off: "LANE_FOLLOWING"
-  start_turning: "TURNING"
-  stop_turning: "LANE_FOLLOWING"
+
 
 states:
   NORMAL_JOYSTICK_CONTROL:
